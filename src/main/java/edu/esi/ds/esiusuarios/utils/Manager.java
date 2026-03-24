@@ -1,23 +1,16 @@
 package edu.esi.ds.esiusuarios.utils;
 
-import edu.esi.ds.esiusuarios.service.BrevoService;
+import org.springframework.stereotype.Component;
+
 import edu.esi.ds.esiusuarios.service.EmailService;
 
+@Component
 public class Manager {
 
-    private static Manager instance;
-    private EmailService emailService;
+    private final EmailService emailService;
 
-    private Manager() {
-        this.emailService = new BrevoService();
-    };
-
-    private synchronized static Manager build() {
-        if (instance == null) {
-            instance = new Manager();
-        }
-
-        return instance;
+    public Manager(EmailService emailService) {
+        this.emailService = emailService;
     }
 
     public EmailService getEmailService() {
