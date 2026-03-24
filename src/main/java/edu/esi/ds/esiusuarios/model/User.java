@@ -20,12 +20,10 @@ public class User {
     private String email;
 
     @Column(nullable = false, length = 255)
-    private String pwd; // almacenamos el hash BCrypt, nunca en claro
+    private String pwd;
 
     @Column(nullable = false)
     private boolean activo = true;
-
-    // ── getters y setters ──────────────────────────────────────────
 
     public String getId() {
         return id;
