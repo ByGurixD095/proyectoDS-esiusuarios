@@ -23,7 +23,7 @@ public class User {
     private String pwd;
 
     @Column(nullable = false)
-    private boolean activo = true;
+    private boolean active = true;
 
     public String getId() {
         return id;
@@ -57,11 +57,11 @@ public class User {
         this.pwd = pwd;
     }
 
-    public boolean isActivo() {
-        return activo;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setActivo(boolean a) {
-        this.activo = a;
+    public void setActive(boolean a) {
+        this.active = a;
     }
 }

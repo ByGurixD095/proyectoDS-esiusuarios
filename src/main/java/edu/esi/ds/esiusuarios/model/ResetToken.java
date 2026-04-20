@@ -19,10 +19,10 @@ public class ResetToken {
     private User user;
 
     @Column(nullable = false)
-    private LocalDateTime expiraEn;
+    private LocalDateTime expires;
 
     @Column(nullable = false)
-    private boolean usado = false;
+    private boolean used = false;
 
     public String getId() {
         return id;
@@ -49,18 +49,18 @@ public class ResetToken {
     }
 
     public LocalDateTime getExpiraEn() {
-        return expiraEn;
+        return expires;
     }
 
     public void setExpiraEn(LocalDateTime e) {
-        this.expiraEn = e;
+        this.expires = e;
     }
 
     public boolean isUsado() {
-        return usado;
+        return used;
     }
 
     public void setUsado(boolean u) {
-        this.usado = u;
+        this.used = u;
     }
 }

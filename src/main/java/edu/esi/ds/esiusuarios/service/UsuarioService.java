@@ -41,14 +41,20 @@ public class UsuarioService {
 
     // ── LOGIN → devuelve JWT ───────────────────────────────────────
 
-    public String login(String name, String pwd) {
-        User user = userDAO.findByName(name);
+    public String login(String name, String email, String pwd) {
+        User user = null;
+
+        if (!name.isEmpty()) {
+            user = userDAO.findByName(name);
+        } else {
+            user = userDAO.findByEmail(email);
+        }
 
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Credenciales inválidas");
         }
 
-        if (!user.isActivo()) {
+        if (!user.isActive()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cuenta cancelada");
         }
 
@@ -78,7 +84,7 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
         }
 
-        user.setActivo(false);
+        user.setActive(false);
         userDAO.save(user);
     }
 

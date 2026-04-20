@@ -44,6 +44,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Las contraseñas no coinciden");
         }
+
         if (pwd1.length() < 8) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "La contraseña debe tener al menos 8 caracteres");
@@ -63,8 +64,9 @@ public class UserController {
     @PutMapping("/login")
     public ResponseEntity<String> login(@RequestBody Map<String, Object> info) {
         String name = info.get("name").toString().trim();
+        String email = info.get("email").toString().trim();
         String pwd = info.get("pwd").toString().trim();
-        String token = userService.login(name, pwd);
+        String token = userService.login(name, email, pwd);
         return ResponseEntity.ok(token);
     }
 
