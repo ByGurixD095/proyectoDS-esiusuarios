@@ -140,4 +140,20 @@ public class UsuarioService {
         rt.setUsed(true);
         resetTokenDAO.save(rt);
     }
+
+    public void cambiarPassword(String token, String pwdActual, String pwdNueva) {
+        String email = validateToken(token);
+        User user = userDAO.findByEmail(email);
+
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado.");
+        }
+
+        if (!encoder.matches(pwdActual, user.getPwd())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La contraseña actual es incorrecta.");
+        }
+
+        user.setPwd(encoder.encode(pwdNueva));
+        userDAO.save(user);
+    }
 }

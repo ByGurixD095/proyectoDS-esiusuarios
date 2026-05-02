@@ -125,6 +125,25 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody Map<String, Object> body) {
+
+        String token = authHeader.replace("Bearer ", "");
+        String pwdActual = getField(body, "pwdActual");
+        String pwdNueva = getField(body, "pwdNueva");
+
+        if (pwdNueva.length() < 8) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "La nueva contraseña debe tener al menos 8 caracteres.");
+        }
+
+        userService.cambiarPassword(token, pwdActual, pwdNueva);
+        return ResponseEntity.ok().build();
+    }
+
     private String getField(Map<String, Object> map, String key) {
         Object val = map.get(key);
         return val != null ? val.toString().trim() : "";
