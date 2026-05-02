@@ -4,7 +4,7 @@ import edu.esi.ds.esiusuarios.model.ResetToken;
 import edu.esi.ds.esiusuarios.model.User;
 import edu.esi.ds.esiusuarios.repository.ResetTokenDAO;
 import edu.esi.ds.esiusuarios.repository.UserDAO;
-import edu.esi.ds.esiusuarios.utils.Manager;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,7 +24,7 @@ public class UsuarioService {
     @Autowired
     JwtService jwtService;
     @Autowired
-    Manager manager;
+    EmailService emailService;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -81,7 +81,7 @@ public class UsuarioService {
         User user = userDAO.findByEmail(email);
 
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+            return;
         }
 
         user.setActive(false);
@@ -93,19 +93,28 @@ public class UsuarioService {
     public void solicitarResetPassword(String email) {
         User user = userDAO.findByEmail(email);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Email no encontrado");
+            return;
         }
 
         ResetToken rt = new ResetToken();
         rt.setId(UUID.randomUUID().toString());
         rt.setToken(UUID.randomUUID().toString().replace("-", ""));
         rt.setUser(user);
-        rt.setExpiraEn(LocalDateTime.now().plusMinutes(30));
+        rt.setExpiraEn(LocalDateTime.now().plusMinutes(10));
         resetTokenDAO.save(rt);
 
-        String cuerpo = "<p>Tu token de recuperación es: <strong>" + rt.getToken() + "</strong></p>"
-                + "<p>Expira en 30 minutos.</p>";
-        manager.getEmailService().sendEmail(email, "Recuperación de contraseña", cuerpo);
+        String cuerpo = "<div style='font-family:Helvetica Neue,Arial,sans-serif;max-width:480px;'>"
+                + "<h2 style='color:#1d1d1f;'>Recuperacion de contrasena</h2>"
+                + "<p style='color:#6e6e73;'>Tu token de recuperacion es:</p>"
+                + "<div style='background:#f5f5f7;border-radius:8px;padding:16px;text-align:center;"
+                + "font-family:monospace;font-size:18px;font-weight:600;color:#1d1d1f;letter-spacing:2px;'>"
+                + rt.getToken()
+                + "</div>"
+                + "<p style='color:#6e6e73;font-size:13px;margin-top:16px;'>"
+                + "Expira en 10 minutos. Si no solicitaste este cambio, ignora este correo.</p>"
+                + "</div>";
+
+        emailService.sendEmail(email, "Recuperación de contraseña", cuerpo);
     }
 
     // ── RESET PASSWORD ────────────────────────────────────────────

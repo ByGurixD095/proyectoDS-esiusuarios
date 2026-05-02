@@ -11,19 +11,14 @@
             "description": "Tiempo expiración del token en milisegundos"
         },
         {
-            "name": "brevo.api-key",
+            "name": "correo.username",
             "type": "java.lang.String",
-            "description": "Clave secreta api brevo"
+            "description": "Correo electrónico para enviar emails"
         },
         {
-            "name": "brevo.from-email",
+            "name": "correo.password",
             "type": "java.lang.String",
-            "description": "Correo empleado para mandar los correos"
-        },
-        {
-            "name": "brevo.from-name",
-            "type": "java.lang.String",
-            "description": "Entidad encargada de enviar los correos"
+            "description": "Contraseña del correo electrónico"
         }
     ]
 }
