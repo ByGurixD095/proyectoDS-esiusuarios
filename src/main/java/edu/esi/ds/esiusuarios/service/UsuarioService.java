@@ -65,7 +65,7 @@ public class UsuarioService {
         return jwtService.generarToken(user.getEmail());
     }
 
-    // ── VALIDATE TOKEN ────────────────────
+    // ── VALIDATE TOKEN ────────────────────────────────────────────
 
     public String validateToken(String token) {
         if (!jwtService.esValido(token)) {
@@ -100,7 +100,7 @@ public class UsuarioService {
         rt.setId(UUID.randomUUID().toString());
         rt.setToken(UUID.randomUUID().toString().replace("-", ""));
         rt.setUser(user);
-        rt.setExpiraEn(LocalDateTime.now().plusMinutes(10));
+        rt.setExpires(LocalDateTime.now().plusMinutes(10));
         resetTokenDAO.save(rt);
 
         String cuerpo = "<div style='font-family:Helvetica Neue,Arial,sans-serif;max-width:480px;'>"
@@ -126,7 +126,7 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Token no válido");
         }
 
-        if (rt.isUsado() || rt.getExpiraEn().isBefore(LocalDateTime.now())) {
+        if (rt.isUsed() || rt.getExpires().isBefore(LocalDateTime.now())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Token expirado o ya utilizado");
         }
 
@@ -134,7 +134,7 @@ public class UsuarioService {
         user.setPwd(encoder.encode(nuevaPwd));
         userDAO.save(user);
 
-        rt.setUsado(true);
+        rt.setUsed(true);
         resetTokenDAO.save(rt);
     }
 }

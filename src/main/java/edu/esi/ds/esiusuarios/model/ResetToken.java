@@ -48,19 +48,19 @@ public class ResetToken {
         this.user = user;
     }
 
-    public LocalDateTime getExpiraEn() {
+    public LocalDateTime getExpires() {
         return expires;
     }
 
-    public void setExpiraEn(LocalDateTime e) {
-        this.expires = e;
+    public void setExpires(LocalDateTime expires) {
+        this.expires = expires;
     }
 
-    public boolean isUsado() {
+    public boolean isUsed() {
         return used;
     }
 
-    public void setUsado(boolean u) {
-        this.used = u;
+    public void setUsed(boolean used) {
+        this.used = used;
     }
 }

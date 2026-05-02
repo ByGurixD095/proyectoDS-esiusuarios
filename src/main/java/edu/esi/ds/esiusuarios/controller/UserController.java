@@ -113,6 +113,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Contraseña no válida");
         }
 
+        System.out.println("Reset password request: token=" + request.getToken() + ", pwd=" + request.getPwd());
         try {
             userService.resetPassword(request.getToken(), request.getPwd());
         } catch (ResponseStatusException e) {
