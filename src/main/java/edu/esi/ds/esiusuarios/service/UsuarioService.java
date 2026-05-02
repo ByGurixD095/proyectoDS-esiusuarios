@@ -104,8 +104,8 @@ public class UsuarioService {
         resetTokenDAO.save(rt);
 
         String cuerpo = "<div style='font-family:Helvetica Neue,Arial,sans-serif;max-width:480px;'>"
-                + "<h2 style='color:#1d1d1f;'>Recuperacion de contrasena</h2>"
-                + "<p style='color:#6e6e73;'>Tu token de recuperacion es:</p>"
+                + "<h2 style='color:#1d1d1f;'>Recuperación de contraseña</h2>"
+                + "<p style='color:#6e6e73;'>Tu token de recuperación es:</p>"
                 + "<div style='background:#f5f5f7;border-radius:8px;padding:16px;text-align:center;"
                 + "font-family:monospace;font-size:18px;font-weight:600;color:#1d1d1f;letter-spacing:2px;'>"
                 + rt.getToken()

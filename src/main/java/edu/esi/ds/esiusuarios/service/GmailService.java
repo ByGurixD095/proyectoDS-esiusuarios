@@ -19,7 +19,13 @@ public class GmailService extends EmailService {
 
     @Override
     public void sendEmail(String destinatario, Object... params) {
-        String asunto = params.length > 0 ? params[0].toString() : "Notificación";
+        if (username == null || username.isBlank() ||
+                appPassword == null || appPassword.isBlank()) {
+            System.err.println("[GmailService] Credenciales no configuradas — correo no enviado a: " + destinatario);
+            return;
+        }
+
+        String asunto = params.length > 0 ? params[0].toString() : "Notificacion";
         String cuerpo = params.length > 1 ? params[1].toString() : "";
 
         try {
@@ -40,16 +46,23 @@ public class GmailService extends EmailService {
             });
 
             MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(username));
+            message.setFrom(new InternetAddress(username, "ESIEntradas", "UTF-8"));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
             message.setSubject(asunto, "UTF-8");
             message.setContent(cuerpo, "text/html; charset=UTF-8");
 
             Transport.send(message);
-            System.out.println("Correo enviado correctamente a " + destinatario);
+            System.out.println("[GmailService] Correo enviado correctamente a: " + destinatario);
+
+        } catch (AuthenticationFailedException e) {
+            System.err.println("[GmailService] Error de autenticacion con Gmail. " +
+                    "Verifica que la contrasena de aplicacion es correcta: " + e.getMessage());
+
+        } catch (MessagingException e) {
+            System.err.println("[GmailService] Error al enviar correo a " + destinatario + ": " + e.getMessage());
 
         } catch (Exception e) {
-            System.err.println("Error al enviar correo a " + destinatario + ": " + e.getMessage());
+            System.err.println("[GmailService] Error inesperado al enviar correo: " + e.getMessage());
         }
     }
 }
