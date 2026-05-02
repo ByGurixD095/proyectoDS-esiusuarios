@@ -130,7 +130,10 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Token expirado o ya utilizado");
         }
 
-        User user = rt.getUser();
+        String userId = rt.getUser().getId();
+        User user = userDAO.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
         user.setPwd(encoder.encode(nuevaPwd));
         userDAO.save(user);
 
