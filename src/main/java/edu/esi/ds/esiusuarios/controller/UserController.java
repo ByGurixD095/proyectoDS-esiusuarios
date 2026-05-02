@@ -1,5 +1,6 @@
 package edu.esi.ds.esiusuarios.controller;
 
+import edu.esi.ds.esiusuarios.dto.ResetPasswordRequest;
 import edu.esi.ds.esiusuarios.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -100,8 +101,6 @@ public class UserController {
         try {
             userService.solicitarResetPassword(email);
         } catch (ResponseStatusException e) {
-            // ── Respuesta siempre 200, nunca revelamos si el email existe ──
-            // Un atacante no puede enumerar cuentas por fuerza bruta.
         }
 
         return ResponseEntity.ok().build();
@@ -109,18 +108,13 @@ public class UserController {
 
     // ── Reset de contraseña ───────────────────────────────────
     @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestBody Map<String, Object> info) {
-        String token = getField(info, "token");
-        String nuevaPwd = getField(info, "pwd");
-
-        if (nuevaPwd.length() < 8) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    "La contraseña debe tener al menos 8 caracteres.");
+    public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordRequest request) {
+        if (request.getPwd() == null || request.getPwd().length() < 8) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Contraseña no válida");
         }
 
         try {
-            userService.resetPassword(token, nuevaPwd);
+            userService.resetPassword(request.getToken(), request.getPwd());
         } catch (ResponseStatusException e) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
