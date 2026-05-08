@@ -11,7 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.HexFormat;
 import java.util.UUID;
 
 @Service
@@ -96,9 +100,11 @@ public class UsuarioService {
             return;
         }
 
+        String rawToken = UUID.randomUUID().toString().replace("-", "");
+
         ResetToken rt = new ResetToken();
         rt.setId(UUID.randomUUID().toString());
-        rt.setToken(UUID.randomUUID().toString().replace("-", ""));
+        rt.setToken(hashToken(rawToken));
         rt.setUser(user);
         rt.setExpires(LocalDateTime.now().plusMinutes(10));
         resetTokenDAO.save(rt);
@@ -108,7 +114,7 @@ public class UsuarioService {
                 + "<p style='color:#6e6e73;'>Tu token de recuperación es:</p>"
                 + "<div style='background:#f5f5f7;border-radius:8px;padding:16px;text-align:center;"
                 + "font-family:monospace;font-size:18px;font-weight:600;color:#1d1d1f;letter-spacing:2px;'>"
-                + rt.getToken()
+                + rawToken
                 + "</div>"
                 + "<p style='color:#6e6e73;font-size:13px;margin-top:16px;'>"
                 + "Expira en 10 minutos. Si no solicitaste este cambio, ignora este correo.</p>"
@@ -117,10 +123,20 @@ public class UsuarioService {
         emailService.sendEmail(email, "Recuperación de contraseña", cuerpo);
     }
 
+    private String hashToken(String rawToken) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(rawToken.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Algoritmo no disponible", e);
+        }
+    }
+
     // ── RESET PASSWORD ────────────────────────────────────────────
 
     public void resetPassword(String token, String nuevaPwd) {
-        ResetToken rt = resetTokenDAO.findByToken(token);
+        ResetToken rt = resetTokenDAO.findByToken(hashToken(token));
 
         if (rt == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Token no válido");

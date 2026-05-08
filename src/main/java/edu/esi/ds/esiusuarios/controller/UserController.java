@@ -57,7 +57,6 @@ public class UserController {
         try {
             userService.solicitarResetPassword(request.email());
         } catch (ResponseStatusException e) {
-            // Se ignora intencionadamente por seguridad (evitar enumeración de usuarios)
         }
         return ResponseEntity.ok().build();
     }
