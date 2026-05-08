@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -13,45 +15,50 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
+        @Autowired
+        private JwtAuthFilter jwtAuthFilter;
 
-    @Autowired
-    private ApiKeyFilter apiKeyFilter;
+        @Autowired
+        private ApiKeyFilter apiKeyFilter;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                // 1. Configuración general: desactivar CSRF y establecer sesiones sin estado
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-                // 2. Configuración de autorización de rutas
-                .authorizeHttpRequests(auth -> auth
-                        // Rutas públicas
-                        .requestMatchers(
-                                "/users/register",
-                                "/users/login",
-                                "/users/forgot-password",
-                                "/users/reset-password")
-                        .permitAll()
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                return http
+                                // 1. Configuración general: desactivar CSRF y establecer sesiones sin estado
+                                .csrf(csrf -> csrf.disable())
+                                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                        // Rutas exclusivas para el servicio esientradas
-                        .requestMatchers("/users/token/**").hasRole("SERVICE")
+                                // 2. Configuración de autorización de rutas
+                                .authorizeHttpRequests(auth -> auth
+                                                // Rutas públicas
+                                                .requestMatchers(
+                                                                "/users/register",
+                                                                "/users/login",
+                                                                "/users/forgot-password",
+                                                                "/users/reset-password")
+                                                .permitAll()
 
-                        // Rutas exclusivas para usuarios registrados
-                        .requestMatchers(
-                                "/users/removeUser",
-                                "/users/change-password")
-                        .hasRole("USER")
+                                                // Rutas exclusivas para el servicio esientradas
+                                                .requestMatchers("/users/token/**").hasRole("SERVICE")
 
-                        // Cualquier otra ruta requiere autenticación
-                        .anyRequest().authenticated())
+                                                // Rutas exclusivas para usuarios registrados
+                                                .requestMatchers(
+                                                                "/users/removeUser",
+                                                                "/users/change-password")
+                                                .hasRole("USER")
 
-                // 3. Configuración del orden de los filtros
-                .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthFilter, ApiKeyFilter.class)
+                                                // Cualquier otra ruta requiere autenticación
+                                                .anyRequest().authenticated())
 
-                .build();
-    }
+                                // 3. Configuración del orden de los filtros
+                                .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
+                                .addFilterBefore(jwtAuthFilter, ApiKeyFilter.class)
+
+                                .build();
+        }
 }

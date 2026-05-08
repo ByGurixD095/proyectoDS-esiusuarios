@@ -1,10 +1,9 @@
 package edu.esi.ds.esiusuarios.controller;
 
 import edu.esi.ds.esiusuarios.dto.*;
-import edu.esi.ds.esiusuarios.service.UsuarioService;
+import edu.esi.ds.esiusuarios.service.IUsuarioService;
 import jakarta.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 @CrossOrigin(origins = "*")
 public class UserController {
 
-    @Autowired
-    UsuarioService userService;
+    private final IUsuarioService userService;
+
+    public UserController(IUsuarioService userService) {
+        this.userService = userService;
+    }
 
     // ── Validar token ─────────────────────────────────────────
     @GetMapping("/token/{token}")
@@ -54,10 +56,7 @@ public class UserController {
     // ── Recuperación de contraseña ────────────────────────────
     @PostMapping("/forgot-password")
     public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        try {
-            userService.solicitarResetPassword(request.email());
-        } catch (ResponseStatusException e) {
-        }
+        userService.solicitarResetPassword(request.email());
         return ResponseEntity.ok().build();
     }
 

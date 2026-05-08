@@ -40,6 +40,7 @@ public class UsuarioService implements IUsuarioService {
         this.encoder = encoder;
     }
 
+    // ── Registro ──────────────────────────────────────────────
     @Override
     public void register(String name, String pwd, String email) {
         User user = new User();
@@ -50,6 +51,7 @@ public class UsuarioService implements IUsuarioService {
         userDAO.save(user);
     }
 
+    // ── Login ─────────────────────────────────────────────────
     @Override
     public String login(String name, String email, String pwd) {
         User user = (name != null && !name.isEmpty()) ? userDAO.findByName(name) : userDAO.findByEmail(email);
@@ -61,14 +63,7 @@ public class UsuarioService implements IUsuarioService {
         return jwtService.generarToken(user.getEmail());
     }
 
-    @Override
-    public String validateToken(String token) {
-        if (!jwtService.esValido(token)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token inválido");
-        }
-        return jwtService.extraerEmail(token);
-    }
-
+    // ── Eliminar cuenta ───────────────────────────────────────
     @Override
     public void cancelarCuenta(String token) {
         String email = validateToken(token);
@@ -79,6 +74,7 @@ public class UsuarioService implements IUsuarioService {
         }
     }
 
+    // ── Recuperación de contraseña ────────────────────────────
     @Override
     public void solicitarResetPassword(String email) {
         User user = userDAO.findByEmail(email);
@@ -126,6 +122,7 @@ public class UsuarioService implements IUsuarioService {
         userDAO.save(user);
     }
 
+    // ── HELPERS ─────────────────────────────────
     private String hashToken(String rawToken) {
         try {
             byte[] digest = MessageDigest.getInstance("SHA-256").digest(rawToken.getBytes(StandardCharsets.UTF_8));
@@ -133,5 +130,13 @@ public class UsuarioService implements IUsuarioService {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("Error criptográfico", e);
         }
+    }
+
+    @Override
+    public String validateToken(String token) {
+        if (!jwtService.esValido(token)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token inválido");
+        }
+        return jwtService.extraerEmail(token);
     }
 }
