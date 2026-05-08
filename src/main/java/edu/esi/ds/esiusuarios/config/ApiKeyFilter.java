@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 public class ApiKeyFilter extends OncePerRequestFilter {
 
-    @Value("${api.key.esientradas}")
+    @Value("${esientradas.api-key}")
     private String validApiKey;
 
     @Override
