@@ -1,6 +1,5 @@
 package edu.esi.ds.esiusuarios.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,11 +14,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-        @Autowired
-        private JwtAuthFilter jwtAuthFilter;
+        private final ApiKeyFilter apiKeyFilter;
+        private final JwtAuthFilter jwtAuthFilter;
 
-        @Autowired
-        private ApiKeyFilter apiKeyFilter;
+        public SecurityConfig(ApiKeyFilter apiKeyFilter, JwtAuthFilter jwtAuthFilter) {
+                this.apiKeyFilter = apiKeyFilter;
+                this.jwtAuthFilter = jwtAuthFilter;
+        }
 
         @Bean
         public PasswordEncoder passwordEncoder() {

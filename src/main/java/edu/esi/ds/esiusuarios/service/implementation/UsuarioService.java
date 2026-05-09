@@ -10,6 +10,7 @@ import edu.esi.ds.esiusuarios.service.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
@@ -69,8 +70,7 @@ public class UsuarioService implements IUsuarioService {
         String email = validateToken(token);
         User user = userDAO.findByEmail(email);
         if (user != null) {
-            user.setActive(false);
-            userDAO.save(user);
+            userDAO.delete(user);
         }
     }
 
@@ -93,6 +93,7 @@ public class UsuarioService implements IUsuarioService {
         emailService.sendPasswordResetEmail(email, rawToken);
     }
 
+    @Transactional
     @Override
     public void resetPassword(String token, String nuevaPwd) {
         ResetToken rt = resetTokenDAO.findByToken(hashToken(token));
@@ -105,10 +106,10 @@ public class UsuarioService implements IUsuarioService {
         user.setPwd(encoder.encode(nuevaPwd));
         userDAO.save(user);
 
-        rt.setUsed(true);
-        resetTokenDAO.save(rt);
+        resetTokenDAO.delete(rt);
     }
 
+    @Transactional
     @Override
     public void cambiarPassword(String token, String pwdActual, String pwdNueva) {
         String email = validateToken(token);
