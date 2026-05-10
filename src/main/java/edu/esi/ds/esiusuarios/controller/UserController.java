@@ -63,8 +63,6 @@ public class UserController {
     // ── Reset de contraseña ───────────────────────────────────
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        System.out.println("Reset password request: token=" + request.token() + ", pwd= [PROTEGIDO]");
-
         try {
             userService.resetPassword(request.token(), request.pwd());
         } catch (ResponseStatusException e) {
